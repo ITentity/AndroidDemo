@@ -1,5 +1,6 @@
 package cn.appscomm.androiddemo;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -26,12 +27,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+        Intent intent = new Intent(this, MyMusicService.class);
         switch (view.getId()){
             case R.id.button:
-                Toast.makeText(this,"开启音乐服务",Toast.LENGTH_LONG).show();
+                startService(intent);
                 break;
             case R.id.button2:
-                Toast.makeText(this,"关闭音乐服务",Toast.LENGTH_LONG).show();
+                stopService(intent);
                 break;
         }
     }
