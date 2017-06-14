@@ -1,15 +1,20 @@
 package cn.appscomm.androiddemo;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
+import cn.appscomm.androiddemo.service.MyNotificationListenerService;
 
 import java.io.File;
 
@@ -29,6 +34,8 @@ public class MainActivity extends BaseAcvtivity implements OnClickListener {
         setContentView(R.layout.activity_main);
         initView();
         initNotify();
+        startNotificationListenService();
+
     }
 
     private void initView() {
@@ -68,6 +75,53 @@ public class MainActivity extends BaseAcvtivity implements OnClickListener {
                 .setDefaults(Notification.DEFAULT_VIBRATE)//向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，使用defaults属性，可以组合：
                 //Notification.DEFAULT_ALL  Notification.DEFAULT_SOUND 添加声音 // requires VIBRATE permission
                 .setSmallIcon(R.mipmap.ic_launcher);
+    }
+
+    // 开启监听通知的服务
+    private void startNotificationListenService() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            Intent intent = new Intent(MainActivity.this,
+                    MyNotificationListenerService.class);
+            startService(intent);
+        } else {
+            Toast.makeText(MainActivity.this, "手机的系统不支持此功能", Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+    // 设置权限
+    private void setAuth() {
+        if(!isEnabled()){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {      // android 系统大于4.3
+                Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+                startActivity(intent);
+            } else {
+                Toast.makeText(MainActivity.this, "手机的系统不支持此功能", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        } else {
+            Toast toast = Toast.makeText(getApplicationContext(), "监控器开关开启", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+
+    // 判断监听通知栏权限是否开启
+    private boolean isEnabled() {
+        String pkgName = getPackageName();
+        final String flat = Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
+        if (!TextUtils.isEmpty(flat)) {
+            final String[] names = flat.split(":");
+            for (int i = 0; i < names.length; i++) {
+                final ComponentName cn = ComponentName.unflattenFromString(names[i]);
+                if (cn != null) {
+                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -180,6 +234,7 @@ public class MainActivity extends BaseAcvtivity implements OnClickListener {
 
     @Override
     public void onClick(View view) {
+        setAuth();
         switch (view.getId()){
             case R.id.send:
                 // 发送一个通知
