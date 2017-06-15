@@ -4,6 +4,8 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -14,6 +16,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
+
+import cn.appscomm.androiddemo.broadcast.NotifyBroadcast;
 import cn.appscomm.androiddemo.service.MyNotificationListenerService;
 
 import java.io.File;
@@ -28,14 +32,49 @@ public class MainActivity extends BaseAcvtivity implements OnClickListener {
     NotificationCompat.Builder mBuilder;
     /** Notification的ID */
     int notifyId = 100;
+    /** 广播 */
+    NotifyBroadcast notifyBroadcast;
+    /** 广播的接收 */
+    public static final String SEND_BROADCAST="SEND_BROADCAST";
+
+    IntentFilter filter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        notifyBroadcast = new NotifyBroadcast();
         initView();
         initNotify();
         startNotificationListenService();
+        initFilter();
+        registerBroadRervice();
+    }
 
+    private void initFilter() {
+        filter = new IntentFilter(SEND_BROADCAST);
+    }
+
+    private void registerBroadRervice() {
+        registerReceiver(notifyBroadcast, filter);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        toggleNotificationListenerService();
+    }
+
+    // 防止程序杀死后，再次启动，不能获得通知消息内容（不过关了在开需要一定的时间）
+    private void toggleNotificationListenerService() {
+        PackageManager pm = getPackageManager();
+        pm.setComponentEnabledSetting(
+                new ComponentName(this, cn.appscomm.androiddemo.service.MyNotificationListenerService.class),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+
+        pm.setComponentEnabledSetting(
+                new ComponentName(this, cn.appscomm.androiddemo.service.MyNotificationListenerService.class),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
     }
 
     private void initView() {
@@ -275,5 +314,11 @@ public class MainActivity extends BaseAcvtivity implements OnClickListener {
                 startActivity(intent1);
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(notifyBroadcast);
     }
 }

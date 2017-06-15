@@ -2,10 +2,10 @@ package cn.appscomm.androiddemo.service;
 
 import android.app.Notification;
 import android.content.Intent;
+import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by zhaozx on 2017/6/14.
@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 public class MyNotificationListenerService extends NotificationListenerService {
     private String LOG = MyNotificationListenerService.class.getSimpleName();
+    public static final String SEND_BROADCAST="SEND_BROADCAST";
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
@@ -22,15 +23,35 @@ public class MyNotificationListenerService extends NotificationListenerService {
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         super.onNotificationPosted(sbn);
+        Log.e("AAA", "=2==onNotificationPosted   ID :"
+                + sbn.getId() + "\t"
+                + sbn.getNotification().tickerText + "\t"
+                + sbn.getNotification().toString() + "\t"
+                + sbn.toString() + "\t"
+                + sbn.getPackageName());
         Notification n = sbn.getNotification();
-        // 标题和时间
         String title = "";
         if (n.tickerText != null) {
             title = n.tickerText.toString();
         }
         long when = n.when;
-        Log.e(LOG,title+"-"+when+"-"+n.getClass());
-        // Toast.makeText(this, title+when, Toast.LENGTH_LONG).show();
+        String packageName=sbn.getPackageName();
+        Intent intent=new Intent();
+        intent.setAction(SEND_BROADCAST);
+        Bundle bundle=new Bundle();
+        bundle.putString("packageName",packageName);
+        bundle.putString("title",title);
+        bundle.putString("when",when+"");
+        intent.putExtras(bundle);
+        this.sendBroadcast(intent);
+//        // 标题和时间
+//        String title = "";
+//        if (n.tickerText != null) {
+//            title = n.tickerText.toString();
+//        }
+//        long when = n.when;
+//        Log.e(LOG,title+"-"+when+"-"+sbn.getPackageName());
+//        // Toast.makeText(this, title+when, Toast.LENGTH_LONG).show();
     }
 
     @Override
