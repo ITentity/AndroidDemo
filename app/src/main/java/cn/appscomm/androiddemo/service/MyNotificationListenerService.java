@@ -17,7 +17,8 @@ public class MyNotificationListenerService extends NotificationListenerService {
     public static final String SEND_BROADCAST="SEND_BROADCAST";
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
+        // return super.onStartCommand(intent, flags, startId);
+        return START_REDELIVER_INTENT;
     }
 
     @Override
