@@ -4,11 +4,56 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true"
     tools:context="cn.appscomm.androiddemo.MainActivity">
 
-    <TextView
+    <Button
+        android:id="@+id/send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"/>
+        android:text="显示通知栏" />
+
+    <Button
+        android:id="@+id/send1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="显示大通知栏" />
+    <Button
+        android:id="@+id/send2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="显示常驻通知栏" />
+    <Button
+        android:id="@+id/send3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="显示通知，点击跳转到指定Activity" />
+    <Button
+        android:id="@+id/send4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="显示通知，点击打开APK" />
+    <Button
+        android:id="@+id/send5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="清除指定通知" />
+    <Button
+        android:id="@+id/send6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="清除所有通知" />
+    <Button
+        android:id="@+id/send7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="显示自定义的通知栏" />
+    <Button
+        android:id="@+id/send8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="显示带进度条的通知栏" />
 
 </LinearLayout>
