@@ -4,21 +4,31 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
+import cn.appscomm.androiddemo.activity.ContectActivity;
 import cn.appscomm.androiddemo.base.BaseAcvtivity;
 
 
 public class MainActivity extends BaseAcvtivity implements OnClickListener {
 
-    private Button send, send1, send2, send3, send4, send5, send6, send7, send8;
+    private Button send, send1, send2, send3, send4, send5, send6, send7, send8, scrop_map, getContect;
+    private Bitmap temBitmap;
+    private ImageView image;
     /** Notification构造器 */
     NotificationCompat.Builder mBuilder;
     /** Notification的ID */
@@ -41,6 +51,9 @@ public class MainActivity extends BaseAcvtivity implements OnClickListener {
         send6 = (Button) findViewById(R.id.send6);
         send7 = (Button) findViewById(R.id.send7);
         send8 = (Button) findViewById(R.id.send8);
+        scrop_map = (Button) findViewById(R.id.scrop_map);
+        image = (ImageView) findViewById(R.id.image);
+        getContect = (Button) findViewById(R.id.getContect);
 
         send.setOnClickListener(this);
         send1.setOnClickListener(this);
@@ -51,6 +64,8 @@ public class MainActivity extends BaseAcvtivity implements OnClickListener {
         send6.setOnClickListener(this);
         send7.setOnClickListener(this);
         send8.setOnClickListener(this);
+        scrop_map.setOnClickListener(this);
+        getContect.setOnClickListener(this);
     }
 
     /** 初始化通知栏 */
@@ -219,6 +234,62 @@ public class MainActivity extends BaseAcvtivity implements OnClickListener {
                 Intent intent1 = new Intent(MainActivity.this, ProgressActivity.class);
                 startActivity(intent1);
                 break;
+            case R.id.scrop_map:
+                // 截图
+                beginScropMap();
+                break;
+            case R.id.getContect:
+                // 截图
+                Intent contectIntent = new Intent(MainActivity.this, ContectActivity.class);
+                startActivity(contectIntent);
+                break;
+        }
+    }
+
+    public void beginScropMap() {
+        //获取当前屏幕的大小
+        int width = this.getWindow().getDecorView().getRootView().getWidth();
+        int height = this.getWindow().getDecorView().getRootView().getHeight();
+        //生成相同大小的图片
+        temBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        //找到当前页面的跟布局
+        View view = this.getWindow().getDecorView().getRootView();
+        //设置缓存
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+        //从缓存中获取当前屏幕的图片
+        temBitmap = view.getDrawingCache();
+        temBitmap = Bitmap.createBitmap(temBitmap, 20, 30, 200, 200);
+        image.setImageBitmap(temBitmap);
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            try {
+                String sdCardDir = Environment.getExternalStorageDirectory() + "/W00_PRO/";
+                File dirFile = new File(sdCardDir);  //目录转化成文件夹
+                if (!dirFile.exists()) {              //如果不存在，那就建立这个文件夹
+                    dirFile.mkdirs();
+                }
+                File file = new File(sdCardDir, "W00_PRO" + ".png");
+                if (file.exists()) {
+                    file.delete();
+                }
+
+                OutputStream out = null;
+                try {
+                    out = new FileOutputStream(file);
+                    temBitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    out.flush();
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //  "保存已经至" + Environment.getExternalStorageDirectory() + "/W00_PRO/" + "目录文件夹下",
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
